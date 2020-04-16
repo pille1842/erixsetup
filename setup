@@ -1,0 +1,176 @@
+#!/bin/bash
+# Erix Setup Version 0.1.0 -- Setup-Routine für Ubuntu 20.04 LTS
+# Copyright (C) 2020 Eric Haberstroh <gpg@erixpage.de>
+
+# Dieses Programm ist Freie Software: Sie können es unter den Bedingungen
+# der GNU General Public License, wie von der Free Software Foundation,
+# Version 3 der Lizenz oder (nach Ihrer Wahl) jeder neueren
+# veröffentlichten Version, weiter verteilen und/oder modifizieren.
+
+# Dieses Programm wird in der Hoffnung bereitgestellt, dass es nützlich sein wird, jedoch
+# OHNE JEDE GEWÄHR; sogar ohne die implizite
+# Gewähr der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.
+# Siehe die GNU General Public License für weitere Einzelheiten.
+
+# Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
+# Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>.
+
+source $(dirname $0)/common.sh
+
+## Begrüßungsnachricht
+echo "Erix Setup Version $VERSION -- Setup-Routine für Ubuntu 20.04 LTS"
+echo ""
+echo "Copyright (C) 2020 Eric Haberstroh <gpg@erixpage.de>"
+echo ""
+echo "Dieses Programm ist Freie Software: Sie können es unter den Bedingungen"
+echo "der GNU General Public License, wie von der Free Software Foundation,"
+echo "Version 3 der Lizenz oder (nach Ihrer Wahl) jeder neueren"
+echo "veröffentlichten Version, weiter verteilen und/oder modifizieren."
+echo ""
+echo "Dieses Programm wird in der Hoffnung bereitgestellt, dass es nützlich sein wird, jedoch"
+echo "OHNE JEDE GEWÄHR; sogar ohne die implizite"
+echo "Gewähr der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK."
+echo "Siehe die GNU General Public License für weitere Einzelheiten."
+echo ""
+echo "Sie sollten eine Kopie der GNU General Public License zusammen mit diesem"
+echo "Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>."
+echo ""
+
+## Einstellungen laden
+test -r settings || fatal "Die Einstellungen aus der Datei settings können nicht geladen werden."
+source settings
+
+## Prüfen, ob alle notwendigen Variablen gesetzt sind
+vars="DESIRED_APT DESIRED_SNAP"
+
+for var in $vars; do
+    test -n "${!var}" || fatal "Die Variable $var wird in settings nicht definiert, wird aber zwingend benötigt."
+done
+
+## Installation gewünschter APT-Pakete
+notice "Die folgenden Pakete werden nun mittels APT installiert:"
+echo $DESIRED_APT
+echo ""
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    sudo apt install $DESIRED_APT
+fi
+
+## Installation gewünschter Snaps
+notice "Die folgenden Programme werden nun als Snap installiert:"
+echo $DESIRED_SNAP
+echo ""
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    for snap in $DESIRED_SNAP; do
+        sudo snap install --classic $snap
+    done
+fi
+
+## Google Chrome herunterladen und installieren
+notice "Google Chrome wird als Debian-Paket heruntergeladen und installiert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    pushd /tmp
+    wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    sudo dpkg -i google-chrome-stable_current_amd64.deb
+    rm google-chrome-stable_current_amd64.deb
+    popd
+fi
+
+## NUR AENEAS: Mountpoints anlegen
+if [[ "$(hostname)" = "aeneas" ]]; then
+    notice "(aeneas): Die Mountpoints /EXTERN, /EXTWIN und /WINDOWS werden angelegt:"
+    notice "/EXTERN  = ext4-Partition auf der externen Festplatte"
+    notice "/EXTWIN  = NTFS-Partition auf der externen Festplatte"
+    notice "/WINDOWS = NTFS-Partition auf der internen Festplatte"
+    notice "/etc/fstab wird konfiguriert, diese Partitionen beim Systemstart einzuhängen, und sie werden sofort gemountet."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo mkdir /EXTERN /EXTWIN /WINDOWS
+        echo '/dev/disk/by-id/usb-WD_Elements_10A8_575841314136343359483933-0:0-part1 /EXTERN auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
+        echo '/dev/disk/by-id/usb-WD_Elements_10A8_575841314136343359483933-0:0-part2 /EXTWIN auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
+        echo '/dev/disk/by-uuid/BAA0E7E2A0E7A35D /WINDOWS auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
+        sudo mount /EXTERN
+        sudo mount /EXTWIN
+        sudo mount /WINDOWS
+    fi
+fi
+
+## LAMP-Setup
+notice "Es wird nun mysql_secure_installation ausgeführt, um MariaDB zu konfigurieren."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    sudo mysql_secure_installation
+fi
+
+## Bildschirmabschaltung
+notice "Die Bildschirmabschaltung bei Untätigkeit wird auf 15 Minuten eingestellt."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gsettings set "org.gnome.desktop.session" "idle-delay" 900
+fi
+
+## Dash-To-Dock
+notice "Die Größe der Icons im Dock wird nun auf 24 Pixel reduziert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gsettings set "org.gnome.shell.extensions.dash-to-dock" "dash-max-icon-size" 24
+fi
+
+## GNOME Terminal
+notice "Die Standardgröße eines Terminalfensters wird nun auf 125x40 Zeilen gesetzt."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    profile=$(gsettings get org.gnome.Terminal.ProfilesList default)
+    profile=${profile:1:-1}
+    gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$profile/" default-size-columns 125
+    gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$profile/" default-size-rows 40
+fi
+
+notice "Die Taste F10 für den Menüaufruf in Terminalfenstern wird deaktiviert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gsettings set "org.gnome.Terminal.Legacy.Settings" "menu-accelerator-enabled" false
+fi
+
+## Essentials-Backup wiederherstellen
+notice "Das Archiv essentials.tar.gz wird in $HOME entpackt."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    dir=$(pwd)
+    pushd $HOME
+    tar xzvf $dir/essentials.tar.gz
+    popd
+fi
+
+## Verzeichnisse in $HOME anlegen
+notice "Die Verzeichnisse Temp und Code werden in $HOME angelegt."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    mkdir $HOME/{Code,Temp}
+fi
+
+## Oh My Zsh
+notice "Oh My Zsh wird geklont und installiert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    pushd $HOME
+    sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    rm .zshrc
+    popd
+fi
+
+## Dotfiles
+notice "Persönliche Dotfiles werden geklont und installiert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    pushd $HOME/Code
+    git clone https://github.com/pille1842/dotfiles
+    pushd dotfiles
+    ./install.sh
+    popd
+    popd
+fi
+
+success "Setup wurde erfolgreich abgeschlossen. Ein Logout wird dringend empfohlen."

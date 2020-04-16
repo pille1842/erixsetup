@@ -1,0 +1,2 @@
+DESIRED_APT="git mc apache2 mariadb-server php libapache2-mod-php phpmyadmin calibre borgbackup zsh"
+DESIRED_SNAP="code chromium discord spotify"

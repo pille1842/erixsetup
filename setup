@@ -122,16 +122,10 @@ if [[ $? -eq 0 ]]; then
     popd
 fi
 
-notice "NodeJS wird installiert."
+notice "NodeJS Version ~12 wird als Snap installiert."
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
-    pushd /tmp
-    wget "https://nodejs.org/download/release/latest/node-v13.13.0-linux-x64.tar.xz"
-    pushd /usr/local
-    sudo tar --strip-components=1 --no-same-owner -xvf /tmp/node-v13.13.0-linux-x64.tar.xz
-    sudo rm CHANGELOG.md LICENSE README.md
-    popd
-    popd
+    sudo snap install node --classic --channel=12
 fi
 
 ## Tastaturkürzel

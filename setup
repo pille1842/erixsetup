@@ -66,7 +66,7 @@ if [[ $? -eq 0 ]]; then
         sudo snap install $snap
         if [[ $? -ne 0 ]]; then
             warn "Die Installation scheint fehlgeschlagen zu sein. Versuch mit Option --classic wird unternommen."
-        sudo snap install --classic $snap
+            sudo snap install --classic $snap
         fi
     done
 fi
@@ -106,6 +106,13 @@ notice "Es wird nun mysql_secure_installation ausgeführt, um MariaDB zu konfigu
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
     sudo mysql_secure_installation
+fi
+
+## Tastaturkürzel
+notice "Das Tastaturkürzel Strg + Alt + C für den Taschenrechner wird eingerichtet."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gsettings set "org.gnome.settings-daemon.plugins.media-keys" "calculator" "['<Primary><Alt>c']"
 fi
 
 ## Bildschirmabschaltung

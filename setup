@@ -41,7 +41,7 @@ test -r settings || fatal "Die Einstellungen aus der Datei settings können nich
 source settings
 
 ## Prüfen, ob alle notwendigen Variablen gesetzt sind
-vars="DESIRED_APT DESIRED_SNAP"
+vars="DESIRED_APT DESIRED_SNAP DESIRED_DIRS"
 
 for var in $vars; do
     test -n "${!var}" || fatal "Die Variable $var wird in settings nicht definiert, wird aber zwingend benötigt."
@@ -145,10 +145,15 @@ if [[ $? -eq 0 ]]; then
 fi
 
 ## Verzeichnisse in $HOME anlegen
-notice "Die Verzeichnisse Temp und Code werden in $HOME angelegt."
+notice "Die folgenden Verzeichnisse werden in $HOME angelegt:"
+echo $DESIRED_DIRS
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
-    mkdir $HOME/{Code,Temp}
+    pushd $HOME
+    for d in $DESIRED_DIRS; do
+        mkdir -v $d
+    done
+    popd
 fi
 
 ## Oh My Zsh

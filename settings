@@ -1,2 +1,10 @@
-DESIRED_APT="git mc apache2 mariadb-server php libapache2-mod-php phpmyadmin calibre borgbackup zsh"
-DESIRED_SNAP="code chromium discord spotify"
+## Konfigurationsdatei für Erix Setup
+
+## Liste von Paketen, die mittels APT installiert werden sollen
+DESIRED_APT="git mc apache2 mariadb-server php libapache2-mod-php phpmyadmin calibre borgbackup zsh thefuck"
+
+## Liste von Paketen, die als Snaps installiert werden sollen
+DESIRED_SNAP="code chromium discord spotify vlc"
+
+## Liste von Verzeichnissen, die im Home-Verzeichnis angelegt werden sollen
+DESIRED_DIRS="Code Temp bin"

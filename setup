@@ -108,6 +108,32 @@ if [[ $? -eq 0 ]]; then
     sudo mysql_secure_installation
 fi
 
+notice "Composer wird installiert und ein Self-Update durchgeführt."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    pushd /tmp
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+    php composer-setup.php
+    php -r "unlink('composer-setup.php');"
+    sudo mv -v composer.phar /usr/local/bin/composer
+    sudo chown -v root:root /usr/local/bin/composer
+    sudo composer self-update
+    popd
+fi
+
+notice "NodeJS wird installiert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    pushd /tmp
+    wget "https://nodejs.org/download/release/latest/node-v13.13.0-linux-x64.tar.xz"
+    pushd /usr/local
+    sudo tar --strip-components=1 --no-same-owner -xvf /tmp/node-v13.13.0-linux-x64.tar.xz
+    sudo rm CHANGELOG.md LICENSE README.md
+    popd
+    popd
+fi
+
 ## Tastaturkürzel
 notice "Das Tastaturkürzel Strg + Alt + C für den Taschenrechner wird eingerichtet."
 cont_skip_abort

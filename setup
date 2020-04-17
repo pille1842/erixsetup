@@ -63,7 +63,11 @@ echo ""
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
     for snap in $DESIRED_SNAP; do
+        sudo snap install $snap
+        if [[ $? -ne 0 ]]; then
+            warn "Die Installation scheint fehlgeschlagen zu sein. Versuch mit Option --classic wird unternommen."
         sudo snap install --classic $snap
+        fi
     done
 fi
 

@@ -41,7 +41,7 @@ test -r settings || fatal "Die Einstellungen aus der Datei settings können nich
 source settings
 
 ## Prüfen, ob alle notwendigen Variablen gesetzt sind
-vars="DESIRED_APT DESIRED_SNAP DESIRED_DIRS"
+vars="DESIRED_APT DESIRED_SNAP DESIRED_DIRS WORKGROUP"
 
 for var in $vars; do
     test -n "${!var}" || fatal "Die Variable $var wird in settings nicht definiert, wird aber zwingend benötigt."
@@ -185,6 +185,73 @@ if [[ $? -eq 0 ]]; then
         mkdir -v $d
     done
     popd
+fi
+
+## Samba / Shares
+if [[ -e /etc/samba/smb.conf ]]; then
+    notice "Es wird ein SMB-Passwort für den Benutzer $USER vergeben."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo smbpasswd -a $USER
+    fi
+
+    notice "Samba wird für die Verwendung der Arbeitsgruppe $WORKGROUP konfiguriert."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo cp -v /etc/samba/smb.conf{,.SKP}
+        sudo sed -i "s/WORKGROUP/$WORKGROUP/" /etc/samba/smb.conf
+    fi
+
+    notice "Die folgenden User-Shares werden angelegt:"
+    notice "  - ${USER}_docs   -> $HOME/Dokumente"
+    notice "  - ${USER}_music  -> $HOME/Musik"
+    notice "  - ${USER}_public -> $HOME/Öffentlich"
+    notice "  - ${USER}_videos -> $HOME/Videos"
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        domainsid=$(sudo net getlocalsid | cut -d':' -f2 | sed "s/ //g")
+        usersid="$domainsid-$UID"
+        (sudo cat <<EOF
+#VERSION 2
+path=/home/eric/Dokumente
+comment=
+usershare_acl=S-1-1-0:R,${usersid}:F
+guest_ok=n
+sharename=eric_docs
+EOF
+        )>/var/lib/samba/usershares/eric_docs
+        (sudo cat <<EOF
+#VERSION 2
+path=/home/eric/Musik
+comment=
+usershare_acl=S-1-1-0:R,${usersid}:F
+guest_ok=n
+sharename=eric_music
+EOF
+        )>/var/lib/samba/usershares/eric_music
+        (sudo cat <<EOF
+#VERSION 2
+path=/home/eric/Öffentlich
+comment=
+usershare_acl=S-1-1-0:F
+guest_ok=n
+sharename=eric_public
+EOF
+        )>/var/lib/samba/usershares/eric_public
+        (sudo cat <<EOF
+#VERSION 2
+path=/home/eric/Videos
+comment=
+usershare_acl=S-1-1-0:R,${usersid}:F
+guest_ok=n
+sharename=eric_videos
+EOF
+        )>/var/lib/samba/usershares/eric_videos
+    fi
+else
+    warn "Samba ist nicht installiert. Wenn Sie den Teil dieses Programms, mit dem Samba konfiguriert wird,"
+    warn "ausführen möchten, fügen Sie samba zur Variable DESIRED_APT in settings hinzu und führen Sie das"
+    warn "Setup-Programm erneut aus."
 fi
 
 ## Oh My Zsh

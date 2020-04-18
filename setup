@@ -102,30 +102,36 @@ if [[ "$(hostname)" = "aeneas" ]]; then
 fi
 
 ## LAMP-Setup
-notice "Es wird nun mysql_secure_installation ausgeführt, um MariaDB zu konfigurieren."
-cont_skip_abort
-if [[ $? -eq 0 ]]; then
-    sudo mysql_secure_installation
-fi
+if [[ -e /usr/bin/mysql_secure_installation ]]; then
+    notice "Es wird nun mysql_secure_installation ausgeführt, um MariaDB zu konfigurieren."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo mysql_secure_installation
+    fi
 
-notice "Composer wird installiert und ein Self-Update durchgeführt."
-cont_skip_abort
-if [[ $? -eq 0 ]]; then
-    pushd /tmp
-    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-    php composer-setup.php
-    php -r "unlink('composer-setup.php');"
-    sudo mv -v composer.phar /usr/local/bin/composer
-    sudo chown -v root:root /usr/local/bin/composer
-    sudo composer self-update
-    popd
-fi
+    notice "Composer wird installiert und ein Self-Update durchgeführt."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        pushd /tmp
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+        php composer-setup.php
+        php -r "unlink('composer-setup.php');"
+        sudo mv -v composer.phar /usr/local/bin/composer
+        sudo chown -v root:root /usr/local/bin/composer
+        sudo composer self-update
+        popd
+    fi
 
-notice "NodeJS Version ~12 wird als Snap installiert."
-cont_skip_abort
-if [[ $? -eq 0 ]]; then
-    sudo snap install node --classic --channel=12
+    notice "NodeJS Version ~12 wird als Snap installiert."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo snap install node --classic --channel=12
+    fi
+else
+    warn "Es scheint kein LAMP-Server installiert zu sein. Fügen Sie folgende Pakete zu DESIRED_APT in settings hinzu:"
+    warn "  apache2 mariadb-server php libapache2-mod-php"
+    warn "und führen Sie das Setup dann erneut aus, um den LAMP-Server richtig zu konfigurieren."
 fi
 
 ## Tastaturkürzel

@@ -36,6 +36,11 @@ echo "Sie sollten eine Kopie der GNU General Public License zusammen mit diesem"
 echo "Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>."
 echo ""
 
+## Distribution prüfen
+if [[ "$(lsb_release -a 2>/dev/null | grep Codename | cut -d':' -f2 | tr -d '[:blank:]')" != "focal" ]]; then
+    fatal "Dieses Programm ist nur zur Ausführung auf Ubuntu 20.04 LTS (Focal Fossa) konzipiert."
+fi
+
 ## Einstellungen laden
 test -r settings || fatal "Die Einstellungen aus der Datei settings können nicht geladen werden."
 source settings

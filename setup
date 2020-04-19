@@ -240,7 +240,7 @@ if [[ -e /etc/samba/smb.conf ]]; then
     notice "  - ${USER}_videos -> $HOME/Videos"
     cont_skip_abort
     if [[ $? -eq 0 ]]; then
-        domainsid=$(sudo net getlocalsid | cut -d':' -f2 | sed "s/ //g")
+        domainsid=$(sudo net getlocalsid | cut -d':' -f2 | tr -d '[:blank:]')
         usersid="$domainsid-$UID"
         (sudo cat <<EOF
 #VERSION 2

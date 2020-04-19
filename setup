@@ -182,12 +182,12 @@ if [[ $? -eq 0 ]]; then
 fi
 
 ## Essentials-Backup wiederherstellen
-notice "Das Archiv essentials.tar.gz wird in $HOME entpackt."
+notice "Das Archiv essentials.tar.gz.gpg wird in $HOME entpackt."
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
     dir=$(pwd)
     pushd $HOME
-    tar xzvf $dir/essentials.tar.gz
+    gpg --no-options --decrypt $dir/essentials.tar.gz.gpg | tar xzv
     popd
 fi
 

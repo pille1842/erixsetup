@@ -37,6 +37,6 @@ echo "Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>
 echo ""
 
 ## Backuplauf starten
-test -e essentials.tar.gz && fatal "Das Zielarchiv essentials.tar.gz existiert bereits."
-tar czvf essentials.tar.gz ~/.ssh ~/.gnupg
-test $? -eq 0 && success "Essentials wurden erfolgreich gesichert. Die Datei essentials.tar.gz sollte an einen sicheren Ort verschoben werden."
+test -e essentials.tar.gz.gpg && fatal "Das Zielarchiv essentials.tar.gz.gpg existiert bereits."
+tar czv ~/.ssh ~/.gnupg | gpg --symmetric >essentials.tar.gz.gpg
+test $? -eq 0 && success "Essentials wurden erfolgreich gesichert. Die Datei essentials.tar.gz.gpg sollte an einen sicheren Ort verschoben werden."

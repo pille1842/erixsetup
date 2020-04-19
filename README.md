@@ -8,7 +8,8 @@ Da bei der ersten Verwendung des Programms git noch nicht auf dem Rechner instal
 ```
 $ wget https://github.com/pille1842/erixsetup/archive/master.zip
 $ unzip master.zip
-$ mv erixsetup-master erixsetup
+$ mv erixsetup{-master,}
+$ rm master.zip
 ```
 
 ### Einstellungen prüfen & vorbereiten

@@ -146,9 +146,9 @@ notice "Der Bildschirmhintergrund wird konfiguriert."
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
     gsettings set "org.gnome.desktop.background" "picture-options" "'zoom'"
-    gsettings set "org.gnome.desktop.background" "picture-uri" "'file:///usr/share/backgrounds/contest/eoan.xml'"
-    gsettings set "org.gnome.desktop.background" "primary-color" "'#000000000000'"
-    gsettings set "org.gnome.desktop.background" "secondary-color" "'#000000000000'"
+    gsettings set "org.gnome.desktop.background" "picture-uri" "'file:///usr/share/backgrounds/hardy_wallpaper_uhd.png'"
+    gsettings set "org.gnome.desktop.background" "primary-color" "'#000000'"
+    gsettings set "org.gnome.desktop.background" "secondary-color" "'#000000'"
 fi
 
 ## Bildschirmabschaltung

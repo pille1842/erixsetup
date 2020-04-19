@@ -451,7 +451,7 @@ if [[ -e /etc/ssh/sshd_config ]]; then
     notice "Die Anmeldung am SSH-Server mit Passwörtern wird deaktiviert."
     cont_skip_abort
     if [[ $? -eq 0 ]]; then
-        sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no' /etc/ssh/sshd_config
+        sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
     fi
 else
     warn "Es scheint kein SSH-Server installiert zu sein. Fügen Sie openssh-server zu DESIRED_APT in settings hinzu"

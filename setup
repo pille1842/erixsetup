@@ -270,6 +270,140 @@ else
     warn "Setup-Programm erneut aus."
 fi
 
+## Borg Backup
+if [[ -x /usr/bin/borg ]]; then
+    notice "Es wird ein Cronjob angelegt, um täglich ein Backup für $USER auszuführen."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        notice "Soll das Backup lokal oder per SSH erstellt werden?"
+        select target in "lokal" "SSH"; do
+            case $target in
+            "lokal")
+                targeturi="/EXTERN/Dasi/$(hostname)/$USER"
+                break
+                ;;
+            "SSH")
+                targeturi="$USER@aeneas:/EXTERN/Dasi/$(hostname)/$USER"
+                break
+                ;;
+            *)
+                warn "Ungültige Auswahl."
+                ;;
+            esac
+        done
+        notice "Das Backup-Ziel ist $targeturi"
+        notice "Bitte wählen Sie eine Uhrzeit für das Backup:"
+        select clocktime in "17" "18" "19" "20" "21" "22"; do
+            cronline="0 $clocktime * * * test -x $HOME/bin/sichern.sh && $HOME/bin/sichern.sh >$HOME/bin/sichern.sh.log 2>&1"
+            break
+        done
+        notice "Der Eintrag in der Crontab wird folgendermaßen aussehen:"
+        echo "$cronline"
+        (crontab -l 2>/dev/null; echo "$cronline") | crontab -
+        notice "Der Cronjob wurde erfolgreich angelegt."
+        (cat <<EOF
+#!/bin/sh
+# Dieses Skript kann interaktiv aufgerufen werden, aber es ist auch
+# in der Crontab des Nutzers installiert (s. crontab -l). Es sichert
+# das Nutzerverzeichnis und das persönliche FTP-Verzeichnis mittels
+# borg nach $targeturi.
+#
+# 7 tägliche, 4 wöchentliche und 6 monatliche Backups werden aufgehoben.
+
+REPOSITORY="$targeturi"
+
+borg create -v --stats                     \\
+     \$REPOSITORY::backup-\`date +%Y-%m-%d\`  \\
+     /home/\$LOGNAME                        \\
+     --exclude /home/\$LOGNAME/.cache       \\
+     --exclude /home/\$LOGNAME/Temp
+
+borg prune -v \$REPOSITORY --prefix backup- \\
+     --keep-daily=7 --keep-weekly=4 --keep-monthly=6
+EOF
+        ) >$HOME/bin/sichern.sh
+        chmod +x $HOME/bin/sichern.sh
+        notice "Das Backup-Skript für diesen Benutzer wurde automatisch erzeugt."
+        if [[ ! -e "$targeturi" ]]; then
+            warn "Das Backup-Ziel scheint nicht zu existieren. Wenn gewünscht, kann dort ein Borg-Repository erzeugt werden."
+            cont_skip_abort
+            if [[ $? -eq 0 ]]; then
+                notice "Wenn Sie aufgefordert werden, eine Passphrase einzugeben, lassen Sie das Feld bitte leer."
+                notice "Andernfalls wird der Backup-Cronjob nicht funktionieren."
+                borg init --encryption=keyfile --make-parent-dirs $targeturi
+            fi
+        fi
+    fi
+    ## Root-Backup
+    notice "Es wird ein Cronjob angelegt, um täglich ein Backup wichtiger Systemdateien für root auszuführen."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        notice "Soll das Backup lokal oder per SSH erstellt werden?"
+        select target in "lokal" "SSH"; do
+            case $target in
+            "lokal")
+                targeturi="/EXTERN/Dasi/$(hostname)/root"
+                break
+                ;;
+            "SSH")
+                targeturi="root@aeneas:/EXTERN/Dasi/$(hostname)/root"
+                break
+                ;;
+            *)
+                warn "Ungültige Auswahl."
+                ;;
+            esac
+        done
+        notice "Das Backup-Ziel ist $targeturi"
+        notice "Bitte wählen Sie eine Uhrzeit für das Backup:"
+        select clocktime in "17" "18" "19" "20" "21" "22"; do
+            cronline="0 $clocktime * * * test -x /root/bin/sichern.sh && /root/bin/sichern.sh >/root/bin/sichern.sh.log 2>&1"
+            break
+        done
+        notice "Der Eintrag in der Crontab wird folgendermaßen aussehen:"
+        echo "$cronline"
+        (sudo crontab -u root -l 2>/dev/null; echo "$cronline") | sudo crontab -u root -
+        notice "Der Cronjob wurde erfolgreich angelegt."
+        sudo mkdir -p /root/bin
+        (cat <<EOF
+#!/bin/sh
+# Dieses Skript kann interaktiv aufgerufen werden, aber es ist auch
+# in der Crontab des Nutzers installiert (s. crontab -l). Es sichert
+# das Nutzerverzeichnis mittels borg auf die externe Festplatte nach
+# $targeturi.
+#
+# 7 tägliche, 4 wöchentliche und 6 monatliche Backups werden aufgehoben.
+
+REPOSITORY="$targeturi"
+
+borg create -v --stats                     \\
+     \$REPOSITORY::backup-\`date +%Y-%m-%d\`  \\
+     /root                                 \\
+     /etc                                  \\
+     /var/www                              \\
+     /var/lib/mysql
+
+borg prune -v \$REPOSITORY --prefix backup- \\
+     --keep-daily=7 --keep-weekly=4 --keep-monthly=6
+EOF
+        ) >$HOME/bin/sichern.sh
+        chmod +x $HOME/bin/sichern.sh
+        notice "Das Backup-Skript für root wurde automatisch erzeugt."
+        if [[ ! -e "$targeturi" ]]; then
+            warn "Das Backup-Ziel scheint nicht zu existieren. Wenn gewünscht, kann dort ein Borg-Repository erzeugt werden."
+            cont_skip_abort
+            if [[ $? -eq 0 ]]; then
+                notice "Wenn Sie aufgefordert werden, eine Passphrase einzugeben, lassen Sie das Feld bitte leer."
+                notice "Andernfalls wird der Backup-Cronjob nicht funktionieren."
+                sudo -H borg init --encryption=keyfile --make-parent-dirs $targeturi
+            fi
+        fi
+    fi
+else
+    warn "Borg Backup ist nicht installiert. Um das Backup mit diesem Programm zu konfigurieren, fügen Sie borgbackup"
+    warn "zu DESIRED_APT in settings hinzu und führen Sie das Setup erneut aus."
+fi
+
 ## Oh My Zsh
 notice "Oh My Zsh wird geklont und installiert."
 cont_skip_abort

@@ -404,6 +404,45 @@ else
     warn "zu DESIRED_APT in settings hinzu und führen Sie das Setup erneut aus."
 fi
 
+## Root-Passwort
+notice "Es wird ein neues Passwort für den Benutzer root vergeben."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    sudo passwd root
+fi
+
+## SSH-Schlüssel für root
+notice "Es wird ein SSH-Schlüssel für den Benutzer root erzeugt."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    sudo -H ssh-keygen
+    if [[ "$(hostname)" != "aeneas" ]]; then
+        warn "Der SSH-Schlüssel sollte zu root@aeneas kopiert werden, damit das Backup funktioniert."
+        warn "Wenn Sie wünschen, kann dies sofort erledigt werden."
+        cont_skip_abort
+        if [[ $? -eq 0 ]]; then
+            sudo -H ssh-copy-id root@aeneas
+        fi
+    fi
+fi
+
+## SSH-Server
+if [[ -e /etc/ssh/sshd_config ]]; then
+    notice "Der SSH-Server wird so eingestellt, dass er die Anmeldung von root per SSH-Schlüssel erlaubt."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    fi
+    notice "Die Anmeldung am SSH-Server mit Passwörtern wird deaktiviert."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no' /etc/ssh/sshd_config
+    fi
+else
+    warn "Es scheint kein SSH-Server installiert zu sein. Fügen Sie openssh-server zu DESIRED_APT in settings hinzu"
+    warn "und führen Sie das Setup erneut aus, um den SSH-Server richtig zu konfigurieren."
+fi
+
 ## Oh My Zsh
 notice "Oh My Zsh wird geklont und installiert."
 cont_skip_abort

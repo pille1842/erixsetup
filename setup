@@ -188,7 +188,17 @@ if [[ $? -eq 0 ]]; then
     dir=$(pwd)
     pushd $HOME
     gpg --no-options --decrypt $dir/essentials.tar.gz.gpg | tar xzv
+    gpg --import-ownertrust ownertrust.txt
+    rm ownertrust.txt
     popd
+fi
+
+## SSH-Key erzeugen
+notice "Es wird ein SSH-Schlüssel für den Benutzer $USER erzeugt."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    ssh-keygen
+    warn "Der SSH-Schlüssel sollte nun auf alle anderen Rechner mittels ssh-copy-id kopiert werden."
 fi
 
 ## Verzeichnisse in $HOME anlegen

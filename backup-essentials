@@ -1,5 +1,5 @@
 #!/bin/bash
-# Erix Setup Version 0.1.0 -- Setup-Routine für Ubuntu 20.04 LTS
+# Erix Setup Version 0.1.0 -- Backup-Programm für wesentliche GnuPG- und SSH-Dateien
 # Copyright (C) 2020 Eric Haberstroh <gpg@erixpage.de>
 
 # Dieses Programm ist Freie Software: Sie können es unter den Bedingungen

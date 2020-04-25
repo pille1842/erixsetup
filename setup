@@ -193,8 +193,6 @@ if [[ $? -eq 0 ]]; then
     dir=$(pwd)
     pushd $HOME
     gpg --no-options --decrypt $dir/essentials.tar.gz.gpg | tar xzv
-    gpg --import-ownertrust ownertrust.txt
-    rm ownertrust.txt
     popd
 fi
 

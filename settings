@@ -1,10 +1,10 @@
 ## Konfigurationsdatei für Erix Setup
 
 ## Liste von Paketen, die mittels APT installiert werden sollen
-DESIRED_APT="git mc samba openssh-server tmux apache2 mariadb-server php libapache2-mod-php pure-ftpd phpmyadmin calibre borgbackup zsh virtualbox"
+DESIRED_APT="git mc samba openssh-server tmux apache2 mariadb-server php libapache2-mod-php pure-ftpd phpmyadmin calibre borgbackup zsh virtualbox filezilla"
 
 ## Liste von Paketen, die als Snaps installiert werden sollen
-DESIRED_SNAP="code chromium discord spotify vlc filezilla"
+DESIRED_SNAP="code chromium discord spotify vlc"
 
 ## Liste von Verzeichnissen, die im Home-Verzeichnis angelegt werden sollen
 DESIRED_DIRS="Code Temp bin"

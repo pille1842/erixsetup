@@ -37,7 +37,7 @@ echo "Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>
 echo ""
 
 ## Distribution prüfen
-if [[ "$(lsb_release -a 2>/dev/null | grep Codename | cut -d':' -f2 | tr -d '[:blank:]')" != "focal" ]]; then
+if [[ "$(lsb_release -cs)" != "focal" ]]; then
     fatal "Dieses Programm ist nur zur Ausführung auf Ubuntu 20.04 LTS (Focal Fossa) konzipiert."
 fi
 
@@ -53,7 +53,7 @@ for var in $vars; do
 done
 
 ## Installation gewünschter APT-Pakete
-notice "Die folgenden Pakete werden nun mittels APT installiert:"
+notice "Die folgenden Pakete werden mittels APT installiert:"
 echo $DESIRED_APT
 echo ""
 cont_skip_abort
@@ -62,7 +62,7 @@ if [[ $? -eq 0 ]]; then
 fi
 
 ## Installation gewünschter Snaps
-notice "Die folgenden Programme werden nun als Snap installiert:"
+notice "Die folgenden Programme werden als Snap installiert:"
 echo $DESIRED_SNAP
 echo ""
 cont_skip_abort
@@ -108,9 +108,9 @@ if [[ "$(hostname)" = "aeneas" ]]; then
     cont_skip_abort
     if [[ $? -eq 0 ]]; then
         sudo mkdir /EXTERN /EXTWIN /WINDOWS
-        echo '/dev/disk/by-id/usb-WD_Elements_10A8_575841314136343359483933-0:0-part1 /EXTERN auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
-        echo '/dev/disk/by-id/usb-WD_Elements_10A8_575841314136343359483933-0:0-part2 /EXTWIN auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
-        echo '/dev/disk/by-uuid/BAA0E7E2A0E7A35D /WINDOWS auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
+        echo '/dev/sdc1 /EXTERN auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
+        echo '/dev/sdc2 /EXTWIN auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
+        echo '/dev/sdb4 /WINDOWS auto nosuid,nodev,nofail,x-gvfs-show 0 0' | sudo tee -a /etc/fstab
         sudo mount /EXTERN
         sudo mount /EXTWIN
         sudo mount /WINDOWS
@@ -119,7 +119,7 @@ fi
 
 ## LAMP-Setup
 if [[ -e /usr/bin/mysql_secure_installation ]]; then
-    notice "Es wird nun mysql_secure_installation ausgeführt, um MariaDB zu konfigurieren."
+    notice "Es wird mysql_secure_installation ausgeführt, um MariaDB zu konfigurieren."
     cont_skip_abort
     if [[ $? -eq 0 ]]; then
         sudo mysql_secure_installation
@@ -175,14 +175,21 @@ if [[ $? -eq 0 ]]; then
 fi
 
 ## Dash-To-Dock
-notice "Die Größe der Icons im Dock wird nun auf 24 Pixel reduziert."
+notice "Die Größe der Icons im Dock wird auf 24 Pixel reduziert."
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
     gsettings set "org.gnome.shell.extensions.dash-to-dock" "dash-max-icon-size" 24
 fi
 
+notice "Die folgenden Apps werden im Dock abgelegt:"
+notice "Firefox, Chrome, Thunderbird, Nautilus, Terminal, LibreOffice Writer, Visual Studio Code, Spotify, Discord"
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gsettings set "org.gnome.shell" "favorite-apps" "['firefox.desktop', 'google-chrome.desktop', 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'libreoffice-writer.desktop', 'code_code.desktop', 'spotify_spotify.desktop', 'discord_discord.desktop']"
+fi
+
 ## GNOME Terminal
-notice "Die Standardgröße eines Terminalfensters wird nun auf 125x40 Zeilen gesetzt."
+notice "Die Standardgröße eines Terminalfensters wird auf 125x40 gesetzt."
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
     profile=$(gsettings get org.gnome.Terminal.ProfilesList default)
@@ -253,40 +260,40 @@ if [[ -e /etc/samba/smb.conf ]]; then
         usersid="$domainsid-$UID"
         (sudo cat <<EOF
 #VERSION 2
-path=/home/eric/Dokumente
+path=$HOME/Dokumente
 comment=
 usershare_acl=S-1-1-0:R,${usersid}:F
 guest_ok=n
-sharename=eric_docs
+sharename=${USER}_docs
 EOF
-        )>/var/lib/samba/usershares/eric_docs
+        )>/var/lib/samba/usershares/${USER}_docs
         (sudo cat <<EOF
 #VERSION 2
-path=/home/eric/Musik
+path=$HOME/Musik
 comment=
 usershare_acl=S-1-1-0:R,${usersid}:F
 guest_ok=n
-sharename=eric_music
+sharename=${USER}_music
 EOF
-        )>/var/lib/samba/usershares/eric_music
+        )>/var/lib/samba/usershares/${USER}_music
         (sudo cat <<EOF
 #VERSION 2
-path=/home/eric/Öffentlich
+path=$HOME/Öffentlich
 comment=
 usershare_acl=S-1-1-0:F
 guest_ok=n
-sharename=eric_public
+sharename=${USER}_public
 EOF
-        )>/var/lib/samba/usershares/eric_public
+        )>/var/lib/samba/usershares/${USER}_public
         (sudo cat <<EOF
 #VERSION 2
-path=/home/eric/Videos
+path=$HOME/Videos
 comment=
 usershare_acl=S-1-1-0:R,${usersid}:F
 guest_ok=n
-sharename=eric_videos
+sharename=${USER}_videos
 EOF
-        )>/var/lib/samba/usershares/eric_videos
+        )>/var/lib/samba/usershares/${USER}_videos
     fi
 else
     warn "Samba ist nicht installiert. Wenn Sie den Teil dieses Programms, mit dem Samba konfiguriert wird,"
@@ -452,7 +459,7 @@ fi
 
 ## SSH-Server
 if [[ -e /etc/ssh/sshd_config ]]; then
-    notice "Der SSH-Server wird so eingestellt, dass er die Anmeldung von root per SSH-Schlüssel erlaubt."
+    notice "Der SSH-Server wird so eingestellt, dass er die Anmeldung als root nur per SSH-Schlüssel erlaubt."
     cont_skip_abort
     if [[ $? -eq 0 ]]; then
         sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config

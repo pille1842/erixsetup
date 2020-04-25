@@ -429,8 +429,8 @@ borg create -v --stats                     \\
 borg prune -v \$REPOSITORY --prefix backup- \\
      --keep-daily=7 --keep-weekly=4 --keep-monthly=6
 EOF
-        ) >$HOME/bin/sichern.sh
-        chmod +x $HOME/bin/sichern.sh
+        ) | sudo tee /root/bin/sichern.sh
+        sudo chmod +x /root/bin/sichern.sh
         notice "Das Backup-Skript für root wurde automatisch erzeugt."
         if [[ ! -e "$targeturi" ]]; then
             warn "Das Backup-Ziel scheint nicht zu existieren. Wenn gewünscht, kann dort ein Borg-Repository erzeugt werden."

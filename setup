@@ -181,6 +181,18 @@ if [[ $? -eq 0 ]]; then
     gsettings set "org.gnome.shell.extensions.dash-to-dock" "dash-max-icon-size" 24
 fi
 
+notice "Das Dock wird so eingestellt, dass es auf jedem Bildschirm angezeigt wird."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gsettings set "org.gnome.shell.extensions.dash-to-dock" "multi-monitor" "true"
+fi
+
+notice "Externe Laufwerke werden im Dock ausgeblendet."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gsettings set "org.gnome.shell.extensions.dash-to-dock" "show-mounts" "false"
+fi
+
 notice "Die folgenden Apps werden im Dock abgelegt:"
 notice "Firefox, Chrome, Thunderbird, Nautilus, Terminal, LibreOffice Writer, Visual Studio Code, Spotify, Discord"
 cont_skip_abort

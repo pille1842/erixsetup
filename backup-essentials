@@ -39,5 +39,4 @@ echo ""
 ## Backuplauf starten
 test -e essentials.tar.gz.gpg && fatal "Das Zielarchiv essentials.tar.gz.gpg existiert bereits."
 tar czv ~/.ssh/{authorized_keys,known_hosts} ~/.gnupg/ | gpg --symmetric >essentials.tar.gz.gpg
-rm ownertrust.txt
 test $? -eq 0 && success "Essentials wurden erfolgreich gesichert. Die Datei essentials.tar.gz.gpg sollte an einen sicheren Ort verschoben werden."

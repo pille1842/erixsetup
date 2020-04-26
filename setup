@@ -150,6 +150,13 @@ else
     warn "und führen Sie das Setup dann erneut aus, um den LAMP-Server richtig zu konfigurieren."
 fi
 
+## Jekyll
+notice "Jekyll wird als Ruby-Gem installiert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    gem install jekyll bundler
+fi
+
 ## Tastaturkürzel
 notice "Das Tastaturkürzel Strg + Alt + C für den Taschenrechner wird eingerichtet."
 cont_skip_abort

@@ -348,8 +348,7 @@ if [[ -x /usr/bin/borg ]]; then
 #!/bin/sh
 # Dieses Skript kann interaktiv aufgerufen werden, aber es ist auch
 # in der Crontab des Nutzers installiert (s. crontab -l). Es sichert
-# das Nutzerverzeichnis und das persönliche FTP-Verzeichnis mittels
-# borg nach $targeturi.
+# das Nutzerverzeichnis nach $targeturi.
 #
 # 7 tägliche, 4 wöchentliche und 6 monatliche Backups werden aufgehoben.
 
@@ -412,8 +411,7 @@ EOF
 #!/bin/sh
 # Dieses Skript kann interaktiv aufgerufen werden, aber es ist auch
 # in der Crontab des Nutzers installiert (s. crontab -l). Es sichert
-# das Nutzerverzeichnis mittels borg auf die externe Festplatte nach
-# $targeturi.
+# wichtige Systemdateien nach $targeturi.
 #
 # 7 tägliche, 4 wöchentliche und 6 monatliche Backups werden aufgehoben.
 

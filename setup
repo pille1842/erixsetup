@@ -253,6 +253,39 @@ if [[ $? -eq 0 ]]; then
     popd
 fi
 
+## NUR AENEAS: TinyTinyRSS
+if [[ "$(hostname)" = "aeneas" ]]; then
+    if [[ -x /bin/docker ]]; then
+        notice "tt-rss wird als Docker-Container installiert."
+        cont_skip_abort
+        if [[ $? -eq 0 ]]; then
+            if [[ ! -e ~/Code ]]; then
+                mkdir ~/Code
+                warn "~/Code wurde automatisch angelegt, um tt-rss dort zu klonen."
+            fi
+            warn "Benutzer $USER wird zur Gruppe docker hinzugefügt."
+            sudo usermod -aG docker $USER
+            pushd ~/Code
+            git clone https://git.tt-rss.org/fox/ttrss-docker-compose.git ttrss-docker
+            pushd ttrss-docker
+            cp -v .env{-dist,}
+            sed -i "s#SELF_URL_PATH=http://localhost:8280/tt-rss#SELF_URL_PATH=http://aeneas:8280/tt-rss#" .env
+            sed -i 's/HTTP_PORT=127\.0\.0\.1:8280/#HTTP_PORT=127.0.0.1/' .env
+            sed -i 's/#HTTP_PORT=8280/HTTP_PORT=8280/' .env
+            docker-compose up -d
+            notice "tt-rss sollte jetzt unter http://aeneas:8280/tt-rss erreichbar sein."
+            notice "Sie können sich mit admin:password anmelden, das Administrator-Passwort ändern und"
+            notice "einen unprivilegierten Benutzerzugang anlegen."
+            popd
+            popd
+        fi
+    else
+        warn "Docker scheint nicht installiert zu sein, so dass tt-rss nicht konfiguriert werden kann."
+        warn "Um tt-rss zu verwenden, fügen Sie docker.io und docker-compose zu DESIRED_APT in settings"
+        warn "hinzu und führen Sie das Setup erneut aus."
+    fi
+fi
+
 ## Samba / Shares
 if [[ -e /etc/samba/smb.conf ]]; then
     notice "Es wird ein SMB-Passwort für den Benutzer $USER vergeben."

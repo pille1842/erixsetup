@@ -52,6 +52,16 @@ for var in $vars; do
     test -n "${!var}" || fatal "Die Variable $var wird in settings nicht definiert, wird aber zwingend benötigt."
 done
 
+## NUR BOREAS: WLAN reparieren
+if [[ "$(hostname)" = "aeneas" ]]; then
+    notice "Die Hardwareverschlüsselung im WLAN-Treiber wird deaktiviert."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        echo "options ath9k nohwcrypt=1" | sudo tee /etc/modprobe.d/ath9k.conf
+        warn "Sie sollten den Rechner jetzt neu starten und das Setup erneut beginnen."
+    fi
+fi
+
 ## Installation gewünschter APT-Pakete
 notice "Die folgenden Pakete werden mittels APT installiert:"
 echo $DESIRED_APT

@@ -6,6 +6,7 @@ Dies ist ein Protokoll aller Änderungen an Erix Setup und den dazugehörigen Pr
 - Docker.io und docker-compose werden installiert, um [TinyTinyRSS](https://tt-rss.org/) konfigurieren zu können. TinyTinyRSS wird auf aeneas installiert und eingerichtet.
 - Auf boreas wird die Hardwareverschlüsselung im WLAN-Treiber ausgeschaltet. Dies ist notwendig, um eine stabile Verbindung herstellen zu können.
 - Gimp, Inkscape (Snap) und Scribus (APT) werden zusätzlich installiert.
+- Symfony CLI wird heruntergeladen und nach /usr/local/bin installiert.
 
 ## [0.1.0] 2020-04-26
 Dies ist die erste veröffentlichte Version von Erix Setup.

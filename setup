@@ -160,6 +160,14 @@ else
     warn "und führen Sie das Setup dann erneut aus, um den LAMP-Server richtig zu konfigurieren."
 fi
 
+## Symfony
+notice "Symfony CLI wird installiert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    wget https://get.symfony.com/cli/installer -O - | bash
+    sudo mv -v $HOME/.symfony/bin/symfony /usr/local/bin/symfony
+fi
+
 ## Jekyll
 notice "Jekyll wird als Ruby-Gem installiert."
 cont_skip_abort

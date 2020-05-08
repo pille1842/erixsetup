@@ -305,6 +305,7 @@ if [[ "$(hostname)" = "aeneas" ]]; then
             notice "einen unprivilegierten Benutzerzugang anlegen."
             popd
             popd
+            sudo systemctl enable docker.service
         fi
     else
         warn "Docker scheint nicht installiert zu sein, so dass tt-rss nicht konfiguriert werden kann."

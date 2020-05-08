@@ -175,6 +175,15 @@ if [[ $? -eq 0 ]]; then
     gem install jekyll bundler
 fi
 
+## Youtube-dl
+notice "Youtube-dl wird manuell installiert."
+cont_skip_abort
+if [[ $? -eq 0 ]]; then
+    sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+    sudo chown root:root /usr/local/bin/youtube-dl
+    sudo chmod 755 /usr/local/bin/youtube-dl
+fi
+
 ## Tastaturkürzel
 notice "Das Tastaturkürzel Strg + Alt + C für den Taschenrechner wird eingerichtet."
 cont_skip_abort

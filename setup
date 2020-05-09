@@ -184,6 +184,19 @@ if [[ $? -eq 0 ]]; then
     sudo chmod 755 /usr/local/bin/youtube-dl
 fi
 
+## /usr/local/bin/python -> /usr/bin/python3
+if [[ -x "/usr/bin/python3" ]]; then
+    notice "/usr/local/bin/python wird als symbolischer Link auf /usr/bin/python3 eingerichtet."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        pushd /usr/local/bin
+        sudo -H ln -sv /usr/bin/python3 python
+        popd
+    fi
+else
+    warn "Python 3 konnte nicht an der erwarteten Stelle gefunden werden. Das ist ein ernsthaftes Problem."
+fi
+
 ## Tastaturkürzel
 notice "Das Tastaturkürzel Strg + Alt + C für den Taschenrechner wird eingerichtet."
 cont_skip_abort

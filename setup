@@ -320,10 +320,25 @@ if [[ "$(hostname)" = "aeneas" ]]; then
             popd
             sudo systemctl enable docker.service
         fi
+        notice "wiki.js wird als Docker-Container installiert."
+        cont_skip_abort
+        if [[ $? -eq 0 ]]; then
+            if [[ ! -e ~/Code ]]; then
+                mkdir ~/Code
+                warn "~/Code wurde automatisch angelegt, um wikijs-docker dort zu klonen."
+            fi
+            pushd ~/Code
+            git clone https://github.com/pille1842/wikijs-docker
+            pushd wikijs-docker
+            docker-compose up -d
+            notice "Wiki.js sollte jetzt unter http://aeneas:3000/ erreichbar sein."
+            popd
+            popd
+        fi
     else
         warn "Docker scheint nicht installiert zu sein, so dass tt-rss nicht konfiguriert werden kann."
-        warn "Um tt-rss zu verwenden, fügen Sie docker.io und docker-compose zu DESIRED_APT in settings"
-        warn "hinzu und führen Sie das Setup erneut aus."
+        warn "Um tt-rss und wiki.js zu verwenden, fügen Sie docker.io und docker-compose zu DESIRED_APT"
+        warn "in settings hinzu und führen Sie das Setup erneut aus."
     fi
 fi
 

@@ -241,10 +241,10 @@ if [[ $? -eq 0 ]]; then
 fi
 
 notice "Die folgenden Apps werden im Dock abgelegt:"
-notice "Firefox, Chrome, Thunderbird, Nautilus, Terminal, LibreOffice Writer, Visual Studio Code, Spotify, Discord"
+notice "Firefox, Chrome, Thunderbird, Nautilus, Terminal, LibreOffice Writer, Joplin, Visual Studio Code, Spotify, Discord"
 cont_skip_abort
 if [[ $? -eq 0 ]]; then
-    gsettings set "org.gnome.shell" "favorite-apps" "['firefox.desktop', 'google-chrome.desktop', 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'libreoffice-writer.desktop', 'code_code.desktop', 'spotify_spotify.desktop', 'discord_discord.desktop']"
+    gsettings set "org.gnome.shell" "favorite-apps" "['firefox.desktop', 'google-chrome.desktop', 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'libreoffice-writer.desktop', 'joplin-james-carroll_joplin.desktop', 'code_code.desktop', 'spotify_spotify.desktop', 'discord_discord.desktop']"
 fi
 
 ## GNOME Terminal

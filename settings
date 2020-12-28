@@ -1,7 +1,7 @@
 ## Konfigurationsdatei für Erix Setup
 
 ## Liste von Paketen, die mittels APT installiert werden sollen
-DESIRED_APT="apt-file git mc samba openssh-server tmux apache2 mariadb-server php libapache2-mod-php pure-ftpd phpmyadmin calibre borgbackup zsh virtualbox filezilla dconf-editor ruby-full build-essential zlib1g-dev scribus ffmpeg gnucash jedit"
+DESIRED_APT="apt-file git mc samba openssh-server tmux apache2 mariadb-server php libapache2-mod-php pure-ftpd phpmyadmin calibre borgbackup zsh virtualbox filezilla dconf-editor ruby-full build-essential zlib1g-dev scribus ffmpeg gnucash jedit python3-pip"
 
 ## Hinzufügen von APT-Paketen, die nur auf aeneas installiert werden sollen
 if [[ "$(hostname)" = "aeneas" ]]; then

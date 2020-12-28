@@ -541,6 +541,41 @@ else
     warn "zu DESIRED_APT in settings hinzu und führen Sie das Setup erneut aus."
 fi
 
+## iCloud-Backup
+if [[ -x /usr/bin/pip3 ]]; then
+    notice "Das lokale Backup der iCloud-Fotos und -Videos wird eingerichtet."
+    cont_skip_abort
+    if [[ $? -eq 0 ]]; then
+        sudo -H pip3 install icloudpd
+        notice "Der iCloud-Zugang wird jetzt im Schlüsselbund hinterlegt."
+        read -p "iCloud-Benutzername: " ICLOUD_USERNAME
+        icloud --username $ICLOUD_USERNAME
+        notice "Bitte wählen Sie eine Uhrzeit für das Backup:"
+        select clocktime in "14" "15" "16" "17"; do
+            cronline="0 $clocktime * * * test -x $HOME/bin/icloudbackup.sh && $HOME/bin/icloudbackup.sh >$HOME/bin/icloudbackup.sh.log 2>&1"
+            break
+        done
+        notice "Der Eintrag in der Crontab wird folgendermaßen aussehen:"
+        echo "$cronline"
+        (crontab -l 2>/dev/null; echo "$cronline") | crontab -
+        notice "Der Cronjob wurde erfolgreich angelegt."
+        (cat <<EOF
+#!/bin/sh
+# Dieses Skript kann interaktiv aufgerufen werden, aber es ist auch
+# in der Crontab des Nutzers installiert (s. crontab -l). Es lädt alle
+# Fotos und Videos aus der iCloud nach \$HOME/Bilder/Handy/iCloud herunter.
+
+icloudpd --directory \$HOME/Bilder/Handy/iCloud --username $ICLOUD_USERNAME --auto-delete
+EOF
+        ) >$HOME/bin/icloudbackup.sh
+        chmod +x $HOME/bin/icloudbackup.sh
+        notice "Das iCloud-Backup-Skript für diesen Benutzer wurde automatisch erzeugt."
+    fi
+else
+    warn "pip3 ist nicht installiert. Es wird für das icloudpd-Programm zur Sicherung der iCloud-Medien benötigt."
+    warn "Fügen Sie python3-pip zu DESIRED_APT in settings hinzu und führen Sie das Setup erneut aus."
+fi
+
 ## Root-Passwort
 notice "Es wird ein neues Passwort für den Benutzer root vergeben."
 cont_skip_abort

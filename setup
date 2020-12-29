@@ -565,7 +565,7 @@ if [[ -x /usr/bin/pip3 ]]; then
 # in der Crontab des Nutzers installiert (s. crontab -l). Es lädt alle
 # Fotos und Videos aus der iCloud nach \$HOME/Bilder/Handy/iCloud herunter.
 
-icloudpd --directory \$HOME/Bilder/Handy/iCloud --username $ICLOUD_USERNAME --auto-delete
+/usr/local/bin/icloudpd --directory \$HOME/Bilder/Handy/iCloud --username $ICLOUD_USERNAME --auto-delete
 EOF
         ) >$HOME/bin/icloudbackup.sh
         chmod +x $HOME/bin/icloudbackup.sh
